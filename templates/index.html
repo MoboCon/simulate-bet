@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Betting Application</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome CSS for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+    <div class="container mt-5">
+        <h1 class="text-center mb-4"><i class="fas fa-futbol"></i> Sports Betting Application</h1>
+
+        <!-- Team Selection Section -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card p-4 shadow-sm team-card">
+                    <h3 class="text-center text-primary"><i class="fas fa-users"></i> Team 1</h3>
+                    <table class="table table-hover table-striped team-table">
+                        <thead>
+                            <tr>
+                                <th>Match</th>
+                                <th>Won</th>
+                                <th><i class="fas fa-futbol text-success"></i> Goals Scored</th>
+                                <th><i class="fas fa-futbol text-danger"></i> Goals Conceded</th>
+                                <th><i class="fas fa-flag text-warning"></i> Corners</th>
+                                <th><i class="fas fa-square text-danger"></i> Cards</th>
+                            </tr>
+                        </thead>
+                        <tbody id="team1_matches">
+                            <!-- Rows for 7 matches will be generated here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card p-4 shadow-sm team-card">
+                    <h3 class="text-center text-primary"><i class="fas fa-users"></i> Team 2</h3>
+                    <table class="table table-hover table-striped team-table">
+                        <thead>
+                            <tr>
+                                <th>Match</th>
+                                <th>Won</th>
+                                <th><i class="fas fa-futbol text-success"></i> Goals Scored</th>
+                                <th><i class="fas fa-futbol text-danger"></i> Goals Conceded</th>
+                                <th><i class="fas fa-flag text-warning"></i> Corners</th>
+                                <th><i class="fas fa-square text-danger"></i> Cards</th>
+                            </tr>
+                        </thead>
+                        <tbody id="team2_matches">
+                            <!-- Rows for 7 matches will be generated here dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Button to calculate results -->
+        <div class="text-center my-4">
+            <button id="calculateButton" class="btn btn-success btn-lg">Calculate Results</button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="card shadow-sm p-4 results-card">
+            <h2 class="text-center text-info"><i class="fas fa-chart-bar"></i> Results</h2>
+            <div class="result-card text-center">
+                <p><i class="fas fa-trophy text-warning"></i> Team 1 Win Chance: <span id="team1_win_chance"></span>%</p>
+                <p><i class="fas fa-trophy text-warning"></i> Team 2 Win Chance: <span id="team2_win_chance"></span>%</p>
+            </div>
+        </div>
+
+        <!-- Betting Suggestions Section -->
+        <div id="betting-suggestions" class="card shadow-sm p-4 mt-4 betting-card">
+            <h2 class="text-center text-info"><i class="fas fa-comments-dollar"></i> Betting Suggestions</h2>
+            <div class="suggestions-card">
+                <p><i class="fas fa-exclamation-circle text-warning"></i> Team 1 Win Risk: <span id="team1_win_risk"></span></p>
+                <p><i class="fas fa-exclamation-circle text-warning"></i> Team 2 Win Risk: <span id="team2_win_risk"></span></p>
+                <p><i class="fas fa-futbol text-success"></i> Over/Under Goals: <span id="over_under_goals"></span></p>
+                <p><i class="fas fa-flag text-warning"></i> Combined Corners: <span id="combined_corners"></span></p>
+                <p><i class="fas fa-square text-danger"></i> Combined Cards: <span id="combined_cards"></span></p>
+                <p><i class="fas fa-check-circle text-success"></i> Both Teams to Score: <span id="both_teams_score"></span></p>
+                <p><i class="fas fa-futbol text-primary"></i> Under/Over 3 Goals: <span id="under_over_3_goals"></span></p>
+                <p><i class="fas fa-flag text-warning"></i> Team 1 and Team 2 Total Corners: <span id="total_corners"></span></p>
+            </div>
+        </div>
+
+        <!-- Simulation Results Section -->
+        <div id="simulations" class="card shadow-sm p-4 mt-4 simulation-card">
+            <h2 class="text-center text-info"><i class="fas fa-gamepad"></i> Simulations</h2>
+            <div id="simulation-results" class="row">
+                <!-- Simulated match results will be inserted here dynamically -->
+            </div>
+        </div>
+
+        <!-- Survey Section for Winning Chances, Corners, Cards, and Average Goals -->
+        <div id="survey" class="card shadow-sm p-4 mt-4 survey-card">
+            <h2 class="text-center text-info"><i class="fas fa-poll"></i> Survey Results</h2>
+            <p class="text-center">Team 1 Winning Chances: <span id="survey_win_team1"></span>%</p>
+            <p class="text-center">Team 2 Winning Chances: <span id="survey_win_team2"></span>%</p>
+            <p class="text-center">Total Corners: <span id="survey_corners"></span></p>
+            <p class="text-center">Total Cards: <span id="survey_cards"></span></p>
+            <p class="text-center">Average Goals: <span id="survey_avg_goals"></span></p>
+        </div>
+    </div>
+
+    <script>
+        function generateMatchRows(teamId) {
+            const tableBody = document.getElementById(teamId);
+            for (let i = 0; i < 7; i++) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Match ${i + 1}</td>
+                    <td><input type="checkbox" class="won"></td>
+                    <td><input type="number" min="0" max="10" class="goals_scored" value="0"></td>
+                    <td><input type="number" min="0" max="10" class="goals_conceded" value="0"></td>
+                    <td><input type="number" min="0" max="20" class="corners" value="0"></td>
+                    <td><input type="number" min="0" max="10" class="cards" value="0"></td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        generateMatchRows('team1_matches');
+        generateMatchRows('team2_matches');
+
+        document.getElementById('calculateButton').addEventListener('click', function() {
+            const team1_matches = Array.from(document.querySelectorAll('#team1_matches tr')).map(row => {
+                return {
+                    won: row.querySelector('.won').checked,
+                    goals_scored: parseInt(row.querySelector('.goals_scored').value),
+                    goals_conceded: parseInt(row.querySelector('.goals_conceded').value),
+                    corners: parseInt(row.querySelector('.corners').value),
+                    cards: parseInt(row.querySelector('.cards').value)
+                };
+            });
+
+            const team2_matches = Array.from(document.querySelectorAll('#team2_matches tr')).map(row => {
+                return {
+                    won: row.querySelector('.won').checked,
+                    goals_scored: parseInt(row.querySelector('.goals_scored').value),
+                    goals_conceded: parseInt(row.querySelector('.goals_conceded').value),
+                    corners: parseInt(row.querySelector('.corners').value),
+                    cards: parseInt(row.querySelector('.cards').value)
+                };
+            });
+
+            fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    team1_matches: team1_matches,
+                    team2_matches: team2_matches
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('team1_win_chance').innerText = data.team1_win_chance;
+                document.getElementById('team2_win_chance').innerText = data.team2_win_chance;
+
+                document.getElementById('team1_win_risk').innerText = data.betting_suggestions.team1_win_risk;
+                document.getElementById('team2_win_risk').innerText = data.betting_suggestions.team2_win_risk;
+                document.getElementById('over_under_goals').innerText = data.betting_suggestions.over_under_goals;
+                document.getElementById('combined_corners').innerText = data.betting_suggestions.combined_corners;
+                document.getElementById('combined_cards').innerText = data.betting_suggestions.combined_cards;
+                document.getElementById('both_teams_score').innerText = data.betting_suggestions.both_teams_score;
+                document.getElementById('under_over_3_goals').innerText = data.betting_suggestions.under_over_3_goals;
+                document.getElementById('total_corners').innerText = data.betting_suggestions.total_corners;
+
+                const simulationResults = document.getElementById('simulation-results');
+                simulationResults.innerHTML = '';
+                let totalCorners = 0;
+                let totalCards = 0;
+
+                data.simulations.forEach((simulation, index) => {
+                    const simulationDiv = document.createElement('div');
+                    simulationDiv.classList.add('col-md-12', 'mb-4');
+                    simulationDiv.innerHTML = `
+                        <div class="card p-3 shadow-sm">
+                            <h5>Simulation ${index + 1}</h5>
+                            <div class="simulation-details">
+                                <span class="team1-sim">Team 1</span>
+                                <span class="score-box">${simulation.team1_score} - ${simulation.team2_score}</span>
+                                <span class="team2-sim">Team 2</span>
+                            </div>
+                            <div class="simulation-details">
+                                <span class="team1-sim">Corners Team 1</span>
+                                <span class="score-box">${simulation.team1_corners} - ${simulation.team2_corners}</span>
+                                <span class="team2-sim">Corners Team 2</span>
+                            </div>
+                            <div class="simulation-details">
+                                <span class="team1-sim">Cards Team 1</span>
+                                <span class="score-box">${simulation.team1_cards} - ${simulation.team2_cards}</span>
+                                <span class="team2-sim">Cards Team 2</span>
+                            </div>
+                        </div>
+                    `;
+                    simulationResults.appendChild(simulationDiv);
+
+                    // Calcularea totalului de cornere și cartonașe pentru a face media
+                    totalCorners += (simulation.team1_corners + simulation.team2_corners);
+                    totalCards += (simulation.team1_cards + simulation.team2_cards);
+                });
+
+                // Calcularea mediei de cornere și cartonașe
+                const avgCorners = (totalCorners / data.simulations.length).toFixed(2);
+                const avgCards = (totalCards / data.simulations.length).toFixed(2);
+
+                // Calcularea mediei golurilor
+                const totalGoals = data.simulations.reduce((sum, simulation) => sum + simulation.team1_score + simulation.team2_score, 0);
+                const avgGoals = (totalGoals / data.simulations.length).toFixed(2);
+
+                // Actualizarea secțiunii Survey Results
+                document.getElementById('survey_win_team1').innerText = data.team1_win_chance;
+                document.getElementById('survey_win_team2').innerText = data.team2_win_chance;
+                document.getElementById('survey_corners').innerText = avgCorners;
+                document.getElementById('survey_cards').innerText = avgCards;
+                document.getElementById('survey_avg_goals').innerText = avgGoals;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
